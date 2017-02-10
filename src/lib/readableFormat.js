@@ -1,5 +1,5 @@
 function readableFormat(value) {
-  var unitNames = ['b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb']
+  var unitNames = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB']
   var unitIndex = 0
 
   while (value > 1000) {
