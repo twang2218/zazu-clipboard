@@ -2,7 +2,7 @@ const readableFormat = require('./lib/readableFormat')
 const CappedClient = require('./lib/cappedClient')
 
 module.exports = (pluginContext) => {
-  const { cwd, clipboard } = pluginContext
+  const { cwd, clipboard, console } = pluginContext
 
   isTransient = () => {
     const badTypes = [
@@ -41,13 +41,20 @@ module.exports = (pluginContext) => {
 
   let lastClip
   return (env = {}) => {
-    if (isTransient()) { return Promise.resolve() }
-    const clip = getClip(env.ignoreImages)
-    if (!lastClip || lastClip.type !== clip.type || lastClip.raw !== clip.raw) {
-      lastClip = clip
-      const clipCollection = CappedClient.init(cwd, env)
-      return clipCollection.upsert(clip)
+    const begin = Date.now()
+    try {
+      if (isTransient()) { return Promise.resolve() }
+      const clip = getClip(env.ignoreImages)
+      if (!lastClip || lastClip.type !== clip.type || lastClip.raw !== clip.raw) {
+        lastClip = clip
+        const clipCollection = CappedClient.init(cwd, env)
+        return clipCollection.upsert(clip)
+      }
+      return Promise.resolve()
+    } catch(e) {
+      console.log('error', e)
+    } finally {
+      console.log('info', `monitor(): ${Date.now() - begin} ms`)
     }
-    return Promise.resolve()
   }
 }
